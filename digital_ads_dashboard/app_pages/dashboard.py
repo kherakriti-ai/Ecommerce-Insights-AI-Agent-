@@ -161,6 +161,84 @@ with right_col:
         with tab2:
             st.bar_chart(daily_perf, x="DATE", y="Conversions")
 
+# ── Chart 1: Platform Efficiency Comparison ──────────────────────
+with st.container(border=True):
+    st.subheader("Platform Efficiency Comparison")
+    st.caption("Which platform delivers the best value? Lower CPC, CPM and Cost/Conv = more efficient.")
+
+    plat = (
+        filtered.groupby("PLATFORM")
+        .agg(
+            Spend=("SPEND", "sum"),
+            Conversions=("CONVERSIONS", "sum"),
+            Avg_CTR=("CTR", "mean"),
+            Avg_CPC=("CPC", "mean"),
+            Avg_CPM=("CPM", "mean"),
+            Avg_Cost_Conv=("COST_PER_CONVERSION", "mean"),
+            Avg_Conv_Rate=("CONVERSION_RATE", "mean"),
+        )
+        .reset_index()
+    )
+
+    pc1, pc2, pc3 = st.columns(3)
+    with pc1:
+        with st.container(border=True):
+            st.markdown("**Avg CPC by Platform** *(lower = better)*")
+            st.bar_chart(plat, x="PLATFORM", y="Avg_CPC", color="PLATFORM")
+    with pc2:
+        with st.container(border=True):
+            st.markdown("**Avg CPM by Platform** *(lower = better)*")
+            st.bar_chart(plat, x="PLATFORM", y="Avg_CPM", color="PLATFORM")
+    with pc3:
+        with st.container(border=True):
+            st.markdown("**Avg Cost/Conv by Platform** *(lower = better)*")
+            st.bar_chart(plat, x="PLATFORM", y="Avg_Cost_Conv", color="PLATFORM")
+
+    with st.container(border=True):
+        st.markdown("**Platform Summary Table**")
+        plat_display = plat.copy()
+        plat_display["Spend"] = plat_display["Spend"].apply(lambda x: f"${x:,.0f}")
+        plat_display["Avg_CTR"] = plat_display["Avg_CTR"].apply(lambda x: f"{x:.2f}%")
+        plat_display["Avg_CPC"] = plat_display["Avg_CPC"].apply(lambda x: f"${x:.2f}")
+        plat_display["Avg_CPM"] = plat_display["Avg_CPM"].apply(lambda x: f"${x:.2f}")
+        plat_display["Avg_Cost_Conv"] = plat_display["Avg_Cost_Conv"].apply(lambda x: f"${x:.2f}")
+        plat_display["Avg_Conv_Rate"] = plat_display["Avg_Conv_Rate"].apply(lambda x: f"{x:.2f}%")
+        plat_display = plat_display.rename(columns={
+            "PLATFORM": "Platform", "Avg_CTR": "CTR", "Avg_CPC": "CPC",
+            "Avg_CPM": "CPM", "Avg_Cost_Conv": "Cost/Conv", "Avg_Conv_Rate": "Conv Rate"
+        })
+        st.dataframe(plat_display, hide_index=True, use_container_width=True)
+
+# ── Chart 2: Spend vs Conversions — Campaign Scaling View ────────
+with st.container(border=True):
+    st.subheader("Spend vs Conversions — Campaign Scaling View")
+    st.caption("Top-right = scale up (high conversions, high spend efficient). Bottom-right = review or cut.")
+
+    camp_scatter = (
+        filtered.groupby(["PLATFORM", "CAMPAIGN_NAME"])
+        .agg(
+            Total_Spend=("SPEND", "sum"),
+            Total_Conversions=("CONVERSIONS", "sum"),
+            Avg_CTR=("CTR", "mean"),
+            Avg_Cost_Conv=("COST_PER_CONVERSION", "mean"),
+        )
+        .reset_index()
+    )
+    camp_scatter["Efficiency"] = (
+        camp_scatter["Total_Conversions"] / camp_scatter["Total_Spend"] * 100
+    ).round(2)
+
+    sc1, sc2 = st.columns(2)
+    with sc1:
+        with st.container(border=True):
+            st.markdown("**Spend vs Conversions by Campaign**")
+            st.scatter_chart(camp_scatter, x="Total_Spend", y="Total_Conversions", color="PLATFORM")
+    with sc2:
+        with st.container(border=True):
+            st.markdown("**Conversions per $100 Spend** *(higher = more efficient)*")
+            camp_scatter_sorted = camp_scatter.sort_values("Efficiency", ascending=False)
+            st.bar_chart(camp_scatter_sorted, x="CAMPAIGN_NAME", y="Efficiency", color="PLATFORM")
+
 with st.container(border=True):
     st.subheader("Business Insights Summary")
     platform_agg = (
@@ -183,6 +261,12 @@ with st.container(border=True):
     total_spend = filtered["SPEND"].sum()
     total_conversions = filtered["CONVERSIONS"].sum()
     overall_cost_conv = total_spend / total_conversions if total_conversions > 0 else 0
+    spend_fmt = f"${total_spend:,.0f}"
+    conv_fmt = f"{total_conversions:,.0f}"
+    cost_conv_fmt = f"${overall_cost_conv:.2f}"
+    best_cpc_fmt = f"${best_campaign['Cost_per_Conv']:.2f}"
+    worst_cpc_fmt = f"${worst_campaign['Cost_per_Conv']:.2f}"
+
     insights = [
         f"Overall Performance: Total spend of {total_spend:,.0f} generated {total_conversions:,.0f} conversions at an average cost of {overall_cost_conv:.2f} per conversion.",
         f"Best Performing Campaign: {best_campaign['CAMPAIGN_NAME']} ({best_campaign['PLATFORM']}) — lowest cost per conversion at {best_campaign['Cost_per_Conv']:.2f}.",
