@@ -194,4 +194,4 @@ with st.container(border=True):
         if spend_change > 0 and conv_change < spend_change:
             insights.append(f"Efficiency Alert: Spend increased {spend_change:+.0f}% vs prior period but conversions only grew {conv_change:+.0f}% — review budget scaling strategy.")
     for insight in insights:
-        st.markdown(f"- {insight}")
+        st.write(f"• {insight}")
