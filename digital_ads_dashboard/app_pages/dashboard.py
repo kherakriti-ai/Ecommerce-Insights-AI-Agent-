@@ -184,9 +184,9 @@ with st.container(border=True):
     total_conversions = filtered["CONVERSIONS"].sum()
     overall_cost_conv = total_spend / total_conversions if total_conversions > 0 else 0
     insights = [
-        f"Overall Performance: Total spend of {spend_fmt} generated {conv_fmt} conversions at an average cost of {cost_conv_fmt} per conversion.",
-        f"Best Performing Campaign: {best_campaign['CAMPAIGN_NAME']} ({best_campaign['PLATFORM']}) — lowest cost per conversion at {best_cpc_fmt}.",
-        f"Needs Optimization: {worst_campaign['CAMPAIGN_NAME']} ({worst_campaign['PLATFORM']}) — highest cost per conversion at {worst_cpc_fmt}.",
+        f"Overall Performance: Total spend of {total_spend:,.0f} generated {total_conversions:,.0f} conversions at an average cost of {overall_cost_conv:.2f} per conversion.",
+        f"Best Performing Campaign: {best_campaign['CAMPAIGN_NAME']} ({best_campaign['PLATFORM']}) — lowest cost per conversion at {best_campaign['Cost_per_Conv']:.2f}.",
+        f"Needs Optimization: {worst_campaign['CAMPAIGN_NAME']} ({worst_campaign['PLATFORM']}) — highest cost per conversion at {worst_campaign['Cost_per_Conv']:.2f}.",
     ]
     if prev_cost > 0:
         spend_change = (curr_cost - prev_cost) / prev_cost * 100
@@ -194,4 +194,4 @@ with st.container(border=True):
         if spend_change > 0 and conv_change < spend_change:
             insights.append(f"Efficiency Alert: Spend increased {spend_change:+.0f}% vs prior period but conversions only grew {conv_change:+.0f}% — review budget scaling strategy.")
     for insight in insights:
-        st.text("• " + insight)
+        st.write(f"• {insight}")
