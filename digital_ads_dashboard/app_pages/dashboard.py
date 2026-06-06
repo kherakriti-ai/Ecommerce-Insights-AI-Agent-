@@ -184,9 +184,9 @@ with st.container(border=True):
     total_conversions = filtered["CONVERSIONS"].sum()
     overall_cost_conv = total_spend / total_conversions if total_conversions > 0 else 0
     insights = [
-        f"**Overall Performance**: Total spend of **\${total_spend:,.0f}** generated **{total_conversions:,.0f} conversions** at an average cost of **\${overall_cost_conv:.2f}** per conversion.",
-        f"**Best Performing Campaign**: *{best_campaign['CAMPAIGN_NAME']}* ({best_campaign['PLATFORM']}) — lowest cost per conversion at **\${best_campaign['Cost_per_Conv']:.2f}**.",
-        f"**Needs Optimization**: *{worst_campaign['CAMPAIGN_NAME']}* ({worst_campaign['PLATFORM']}) — highest cost per conversion at **\${worst_campaign['Cost_per_Conv']:.2f}**.",
+        f"**Overall Performance**: Total spend of **${total_spend:,.0f}** generated ..."
+        f"**Best Performing Campaign**: ... at **${best_campaign['Cost_per_Conv']:.2f}**."
+        f"**Needs Optimization**: ... at **${worst_campaign['Cost_per_Conv']:.2f}**."
     ]
     if prev_cost > 0:
         spend_change = (curr_cost - prev_cost) / prev_cost * 100
