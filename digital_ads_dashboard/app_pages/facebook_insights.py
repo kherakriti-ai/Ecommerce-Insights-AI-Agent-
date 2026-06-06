@@ -2,8 +2,7 @@ import os
 import streamlit as st
 import pandas as pd
 
-conn = st.connection("snowflake", ttl=os.getenv("SNOWFLAKE_CONNECTION_TTL"))
-
+conn = st.connection("snowflake")
 
 @st.cache_data
 def load_facebook():
