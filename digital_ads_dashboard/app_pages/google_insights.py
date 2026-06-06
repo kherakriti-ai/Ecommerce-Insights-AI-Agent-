@@ -26,6 +26,10 @@ df["DATE"] = pd.to_datetime(df["DATE"])
 
 st.button("Refresh", on_click=clear_google_cache)
 
+campaign_list = sorted(df["CAMPAIGN_NAME"].unique().tolist())
+selected = st.multiselect("Filter Campaigns", options=campaign_list, default=campaign_list)
+df = df[df["CAMPAIGN_NAME"].isin(selected)]
+
 CAMPAIGN_COLORS = {
     "Search Brand Terms": "#1f77b4",
     "Search Generic Terms": "#ff7f0e",
@@ -57,6 +61,9 @@ with st.container(horizontal=True):
     st.metric("Total Spend", f"${df['SPEND'].sum():,.0f}", border=True)
     st.metric("Total Conv Value", f"${df['CONVERSION_VALUE'].sum():,.0f}", border=True)
     st.metric("Overall ROAS", f"{df['CONVERSION_VALUE'].sum() / df['SPEND'].sum():.2f}x", border=True)
+    st.metric("Avg CTR", f"{df['CTR'].mean():.2f}%", border=True)
+    st.metric("Avg CPC", f"${df['CPC'].mean():.2f}", border=True)
+    st.metric("Avg CPM", f"${df['CPM'].mean():.2f}", border=True)
     st.metric("Avg Cost/Conv", f"${df['SPEND'].sum() / df['CONVERSIONS'].sum():.2f}", border=True)
 
 # ─────────────────────────────────────────────

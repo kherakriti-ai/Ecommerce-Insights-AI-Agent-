@@ -42,13 +42,17 @@ avg_ctr = filtered["CTR"].mean()
 avg_conv_rate = filtered["CONVERSION_RATE"].mean()
 avg_cost_conv = filtered["COST_PER_CONVERSION"].mean()
 
+avg_cpc = filtered["CPC"].mean()
+
 with st.container(horizontal=True):
     st.metric("Total Spend", f"${total_spend:,.0f}", border=True)
     st.metric("Total Conversions", f"{total_conversions:,.0f}", border=True)
+    st.metric("Avg CTR", f"{avg_ctr:.2f}%", border=True)
+    st.metric("Avg CPC", f"${avg_cpc:.2f}", border=True)
+    st.metric("Avg CPM", f"${avg_cpm:.2f}", border=True)
     st.metric("Video Views", f"{total_video_views:,.0f}", border=True)
     st.metric("Completions (100%)", f"{total_completions:,.0f}", border=True)
     st.metric("Total Shares", f"{total_shares:,.0f}", border=True)
-    st.metric("Avg CPM", f"${avg_cpm:.2f}", border=True)
 
 # ── Campaign Efficiency Table ──
 with st.container(border=True):
